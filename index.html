@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fffaf7">
+  <title>NiniMah | دنیای دوست‌داشتنی کوچولوها</title>
+  <meta name="description" content="NiniMah، همراه شما در انتخاب لوازم سیسمونی و محصولات نوزاد">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: #fffaf7;
+      color: #493d39;
+      line-height: 1.8;
+    }
+    a { text-decoration: none; color: inherit; }
+    header {
+      padding: 20px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid #f4eae4;
+    }
+    .logo { font-size: 27px; font-weight: 800; color: #bd8c85; }
+    nav { display: flex; gap: 25px; font-size: 14px; }
+    .hero {
+      padding: 85px 8%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      background: #f8e9e5;
+      min-height: 410px;
+    }
+    .hero h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.5; margin-bottom: 15px; }
+    .hero p { color: #796a64; margin-bottom: 28px; }
+    .hero img {
+      width: 42%;
+      max-width: 440px;
+      border-radius: 24px;
+      object-fit: cover;
+    }
+    .btn {
+      display: inline-block;
+      background: #bd8c85;
+      color: white;
+      padding: 11px 25px;
+      border-radius: 30px;
+      font-size: 14px;
+    }
+    section { padding: 65px 8%; }
+    .heading { text-align: center; margin-bottom: 35px; }
+    .heading h2 { font-size: 27px; margin-bottom: 8px; }
+    .heading p { color: #95847e; font-size: 14px; }
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+    .category {
+      background: white;
+      border: 1px solid #f1e7e2;
+      padding: 28px 12px;
+      text-align: center;
+      border-radius: 18px;
+      font-weight: 600;
+      transition: .2s;
+    }
+    .category:hover { transform: translateY(-4px); }
+    .category span { display: block; font-size: 35px; margin-bottom: 10px; }
+    .about {
+      background: #f5eeea;
+      text-align: center;
+    }
+    .about p { max-width: 650px; margin: 15px auto; color: #796a64; }
+    footer {
+      background: #493d39;
+      color: white;
+      text-align: center;
+      padding: 30px 15px;
+      font-size: 13px;
+    }
+    @media(max-width:700px) {
+      header { padding: 15px 5%; flex-wrap: wrap; gap: 12px; }
+      nav { gap: 13px; font-size: 12px; }
+      .hero { flex-direction: column; text-align: center; padding: 55px 7%; }
+      .hero img { width: 100%; max-width: 400px; }
+      .categories { grid-template-columns: repeat(2, 1fr); }
+      section { padding: 45px 6%; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">NiniMah</a>
+  <nav>
+    <a href="#home">خانه</a>
+    <a href="#categories">دسته‌بندی</a>
+    <a href="#about">درباره ما</a>
+    <a href="#contact">تماس</a>
+  </nav>
+</header>
+
+<main>
+  <div class="hero" id="home">
+    <div>
+      <h1>دنیای دوست‌داشتنی کوچولوها</h1>
+      <p>با عشق، زیبایی و آرامش، برای شروع یک زندگی شیرین.</p>
+      <a class="btn" href="#categories">مشاهده دسته‌بندی‌ها</a>
+    </div>
+    <img src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=900" alt="دنیای کودک">
+  </div>
+
+  <section id="categories">
+    <div class="heading">
+      <h2>دسته‌بندی محصولات</h2>
+      <p>همه چیز برای کوچولوی دوست‌داشتنی شما</p>
+    </div>
+    <div class="categories">
+      <div class="category"><span>🍼</span>شیشه و لوازم تغذیه</div>
+      <div class="category"><span>👕</span>لباس نوزاد</div>
+      <div class="category"><span>🛏️</span>سرویس خواب</div>
+      <div class="category"><span>🧸</span>اسباب‌بازی</div>
+      <div class="category"><span>🚼</span>کالسکه و حمل کودک</div>
+      <div class="category"><span>🧴</span>لوازم بهداشتی</div>
+      <div class="category"><span>🛁</span>حمام کودک</div>
+      <div class="category"><span>🎁</span>لوازم سیسمونی</div>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="heading">
+      <h2>درباره NiniMah</h2>
+    </div>
+    <p>
+      در NiniMah تلاش می‌کنیم تجربه‌ای شیرین از انتخاب
+      محصولات مورد نیاز نوزاد و کودک برای شما فراهم کنیم.
+      همراه شما در زیباترین شروع زندگی.
+    </p>
+  </section>
+</main>
+
+<footer id="contact">
+  <h2>NiniMah</h2>
+  <p>برای اطلاعات بیشتر و ارتباط با ما تماس بگیرید.</p>
+  <p>© تمامی حقوق متعلق به NiniMah است.</p>
+</footer>
+
+</body>
+</html>
