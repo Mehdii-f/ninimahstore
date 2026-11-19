@@ -139,6 +139,72 @@
       .floating-chat{bottom:15px;left:15px}.chat-panel{width:min(290px,calc(100vw - 30px))}
     }
   </style>
+
+  /* اصلاح نمایش واکنش‌گرا: جلوگیری از بریده‌شدن تصویر اصلی و هدر */
+  <style>
+    .nav { min-width: 0; }
+    .brand { flex: 0 1 auto; min-width: 0; }
+    .brand > span { display: block; min-width: 0; }
+    .brand-name { display: block; white-space: nowrap; font-size: clamp(16px, 2.1vw, 22px); }
+    .brand-sub { display: block; white-space: nowrap; letter-spacing: 0; }
+    .brand-mark { flex: 0 0 54px; }
+
+    .hero { overflow: visible; }
+    .hero-grid { min-width: 0; }
+    .hero-photo { min-width: 0; width: 100%; }
+    .hero-photo img {
+      display: block;
+      width: 100%;
+      height: auto !important;
+      max-height: none !important;
+      object-fit: contain !important;
+      object-position: center;
+    }
+    .photo-note { right: 14px; bottom: 14px; max-width: calc(100% - 28px); }
+
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 26px; }
+      .hero-copy { text-align: center; }
+      .hero-copy p { margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .hero-photo { width: min(100%, 650px); margin: 0 auto; }
+    }
+    @media (max-width: 650px) {
+      .nav {
+        min-height: 0;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        column-gap: 10px;
+        row-gap: 10px;
+      }
+      .brand { grid-column: 1; grid-row: 1; gap: 8px; }
+      .brand-mark { width: 46px; height: 46px; flex-basis: 46px; }
+      .brand-name { font-size: clamp(15px, 4vw, 19px); }
+      .brand-sub { display: none; }
+      .menu-toggle { display: block; grid-column: 2; grid-row: 1; padding: 0 5px; }
+      .header-search {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+      }
+      .navlinks { top: 122px; }
+      .hero { padding: 30px 0 40px; }
+      .hero-grid { grid-template-columns: minmax(0, 1fr); }
+      .hero-photo { width: 100%; }
+      .hero-photo img { height: auto !important; max-height: none !important; }
+      .photo-note { position: static; display: inline-block; margin: 12px 0 0; max-width: 100%; }
+    }
+    @media (max-width: 380px) {
+      .brand-name { font-size: 14px; }
+      .brand-mark { width: 40px; height: 40px; flex-basis: 40px; }
+    }
+  </style>
+
 </head>
 <body>
   <div class="topline">به دنیای دوست‌داشتنی NiniMah خوش آمدید</div>
