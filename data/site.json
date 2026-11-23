@@ -1,0 +1,92 @@
+{
+  "app": "ninimah",
+  "version": 2,
+  "exportedAt": "2026-11-23T19:00:29.877Z",
+  "data": {
+    "settings": {
+      "siteName": "سیسمونی نی‌نی ماه",
+      "slogan": "دنیای آرامش و زیبایی برای فرشته کوچک شما",
+      "heroBadge": "✨ کامل‌ترین مجموعه سیسمونی نوزاد",
+      "heroTitle": "هر آنچه برای شروع یک",
+      "heroHighlight": "زندگی شیرین نیاز دارید",
+      "heroText": "از پوشاک ضدحساسیت پنبه ارگانیک تا سرویس خواب، لوازم بهداشتی استاندارد و اسباب‌بازی‌های فکری؛ با عشق در کنار شما هستیم.",
+      "aboutTitle": "همراه مطمئن والدین خوش‌سلیقه",
+      "aboutText": "فروشگاه سیسمونی نی‌نی ماه با هدف ارائه باکیفیت‌ترین و ایمن‌ترین محصولات نوزاد و کودک راه‌اندازی شده است. ما در انتخاب تک‌تک کالاها، لطافت پوست نوزاد، ارگونومی استاندارد و طراحی دلنشین را در اولویت قرار می‌دهیم.",
+      "hours": "پشتیبانی همه‌روزه از ساعت ۹ الی ۲۱",
+      "phone": "09133819124",
+      "whatsapp": "",
+      "instagram": "",
+      "telegram": "",
+      "address": "شهرکرد،  خیابان ملت ، مابین چهارراه بازار و میدان فردوسی ، نبش کوچه 55",
+      "logo": "assets/logo.png"
+    },
+    "categories": [
+      {
+        "id": "clothes",
+        "name": "پوشاک",
+        "icon": "👕"
+      },
+      {
+        "id": "bed",
+        "name": "تخت و کمد",
+        "icon": "🛏️"
+      },
+      {
+        "id": "hygiene",
+        "name": "بهداشتی",
+        "icon": "🛁"
+      },
+      {
+        "id": "toys",
+        "name": "اسباب بازی و اکسسوری",
+        "icon": "🧸"
+      },
+      {
+        "id": "xmwtmoubwmov51n",
+        "name": "لوازم حمل نوزاد",
+        "icon": "👶"
+      }
+    ],
+    "products": [
+      {
+        "id": "xmwtms1qdsg3mck",
+        "cat": "clothes",
+        "name": "سرویس 20 تیکه آریانا",
+        "price": 0,
+        "desc": "",
+        "img": "https://statics.basalam.com/public-20/users/LGEmYy/05-29/VwM6x4Rz0fJX8yY5PxInJe4bNqVmz5iO4kHZtRqTC5rPb7TyJj.jpg_800X800X70.jpg"
+      }
+    ],
+    "slides": [
+      {
+        "img": "assets/uploads/slide-1-16fq9wt.jpg",
+        "caption": "تنوع بی‌نظیر پوشاک نخی و ضدحساسیت نوزاد"
+      },
+      {
+        "img": "assets/uploads/slide-2-xi72g.jpg",
+        "caption": "طراحی آرامش‌بخش اتاق کودک با سرویس‌های استاندارد"
+      },
+      {
+        "img": "assets/uploads/slide-3-1hzuicv.jpg",
+        "caption": "مشاوره تخصصی برای انتخاب بهترین سیسمونی"
+      }
+    ],
+    "heroSlides": [
+      {
+        "img": "assets/logo.png",
+        "caption": "کیفیت تضمین‌شده • ارسال به سراسر کشور",
+        "fit": "contain"
+      },
+      {
+        "img": "assets/uploads/hero-2-ifusni.webp",
+        "caption": "اسباب‌بازی و اکسسوری ایمن برای کودک شما",
+        "fit": "cover"
+      },
+      {
+        "img": "assets/uploads/hero-3-1hz7uf8.webp",
+        "caption": "سرویس خواب و کمد با متریال استاندارد",
+        "fit": "cover"
+      }
+    ]
+  }
+}
