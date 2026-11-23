@@ -1,0 +1,10 @@
+{
+  "app": "ninimah",
+  "version": 4,
+  "admin": {
+    "v": 4,
+    "iter": 600000,
+    "salt": "mOV3ly6QS2LdLRKr8gwsQg==",
+    "hash": "3GbfpL5k+q7zzW0pkBEpGRHkv/jXsxIeMKsw8M5mDzA="
+  }
+}
