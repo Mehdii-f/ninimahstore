@@ -27,6 +27,21 @@
     lock: 'ninimah:admin-lock:v2',
     session: 'ninimah:admin-session:v2'
   };
+  const API = String(CFG.API_URL || '').replace(/\/+$/, '');
+  const apiOn = /^https:\/\//.test(API);
+  async function api(path, { method = 'GET', body, token, raw, type } = {}) {
+    const headers = {};
+    if (token) headers.Authorization = 'Bearer ' + token;
+    let payload;
+    if (raw) { payload = raw; headers['Content-Type'] = type; }
+    else if (body !== undefined) { payload = JSON.stringify(body); headers['Content-Type'] = 'application/json'; }
+    try {
+      const r = await fetch(API + path, { method, headers, body: payload, cache: 'no-store' });
+      let j = null; try { j = await r.json(); } catch { /* ignore */ }
+      return { ok: r.ok, status: r.status, j };
+    } catch { return { ok: false, status: 0, j: null }; }
+  }
+  const sessToken = () => { const s = session.get(); return s && s.t ? s.t : ''; };
   const LOGO_FALLBACK = 'assets/favicon.png';
   const DEFAULT_LOGO = 'assets/logo.png';
   const FADE_DISTANCE = 140;
@@ -251,14 +266,17 @@
   const hasDraft = () => store.get(KEYS.data, null) != null;
 
   async function loadPublished() {
-    try {
-      const r = await fetch('data/site.json', { cache: 'no-cache' });
-      if (!r.ok) return null;
-      const j = await r.json();
-      const raw = j && j.data ? j.data : j;
-      if (!raw || !Array.isArray(raw.categories) || !Array.isArray(raw.products) || !Array.isArray(raw.slides)) return null;
-      return sanitizeData(raw);
-    } catch { return null; }
+    for (const u of (apiOn ? [API + '/api/site', 'data/site.json'] : ['data/site.json'])) {
+      try {
+        const r = await fetch(u, { cache: 'no-cache' });
+        if (!r.ok) continue;
+        const j = await r.json();
+        const raw = j && j.data ? j.data : j;
+        if (!raw || !Array.isArray(raw.categories) || !Array.isArray(raw.products) || !Array.isArray(raw.slides)) continue;
+        return sanitizeData(raw);
+      } catch { /* بعدی */ }
+    }
+    return null;
   }
 
   /** تغییر داده با امکان بازگشت در صورت پر بودن حافظه مرورگر */
@@ -571,7 +589,7 @@
     try { return safeEqual(await deriveHash(user, pass, unb64(rec.salt), rec.iter), unb64(rec.hash)); } catch { return false; }
   }
 
-  const adminState = { remote: undefined }; // undefined = هنوز معلوم نیست، null = فایل منتشر نشده، object = رکورد منتشرشده
+  const adminState = { remote: undefined, srv: undefined }; // undefined = هنوز معلوم نیست، null = فایل منتشر نشده، object = رکورد منتشرشده
   const localRec = () => { const r = store.get(KEYS.admin, null); return validRec(r) ? r : null; };
   async function loadRemoteAdmin() {
     try {
@@ -584,6 +602,11 @@
     } catch { return undefined; } // خطای شبکه با «وجود ندارد» فرق دارد
   }
   async function refreshRemoteAdmin() {
+    if (apiOn) {
+      const r = await api('/api/status');
+      if (r.ok && r.j) adminState.srv = !!r.j.setup;
+      return;
+    }
     const r = await loadRemoteAdmin();
     if (r !== undefined) adminState.remote = r;
   }
@@ -602,9 +625,9 @@
     set(v) { store.set(KEYS.audit, v); }
   };
   const sessionValid = () => { const s = session.get(); return !!(s && s.t && s.exp > Date.now() && s.abs > Date.now()); };
-  function startSession() {
+  function startSession(tok) {
     const now = Date.now();
-    session.set({ t: b64(randBytes(16)), exp: now + CFG.ADMIN_SESSION_MIN * 60000, abs: now + CFG.ADMIN_ABSOLUTE_MIN * 60000 });
+    session.set({ t: tok || b64(randBytes(16)), exp: now + CFG.ADMIN_SESSION_MIN * 60000, abs: now + CFG.ADMIN_ABSOLUTE_MIN * 60000 });
   }
   function touchSession() {
     const s = session.get();
@@ -619,7 +642,7 @@
   }
 
   function showAdminView() {
-    const has = !!(validRec(adminState.remote) || localRec());
+    const has = apiOn ? !!adminState.srv : !!(validRec(adminState.remote) || localRec());
     const v = !has ? 'setup' : sessionValid() ? 'dash' : 'login';
     setView('adminModal', v);
     $('#adminCard').classList.toggle('wide', v === 'dash');
@@ -629,7 +652,7 @@
   async function openAdmin() {
     if (!hasCrypto) { toast('مرورگر شما از رمزنگاری پشتیبانی نمی‌کند؛ سایت باید روی https یا localhost باز شود.', 'danger'); return; }
     await refreshRemoteAdmin();
-    if (adminState.remote === undefined && !localRec()) {
+    if (apiOn ? adminState.srv === undefined : (adminState.remote === undefined && !localRec())) {
       toast('اتصال به اینترنت برقرار نیست و فایل ورود مدیر خوانده نشد. چند لحظه بعد دوباره تلاش کنید.', 'danger', 7000);
       return;
     }
@@ -648,6 +671,16 @@
     const btn = $('#adminSetupForm button[type=submit]');
     btn.disabled = true;
     try {
+      if (apiOn) {
+        const r = await api('/api/setup', { method: 'POST', body: { user, pass: p1, key: $('#setupKey').value } });
+        if (!r.ok) return setMsg('adminMsg', r.status === 403 ? 'کد راه‌اندازی نادرست است.' : r.status === 409 ? 'حساب قبلاً ساخته شده؛ وارد شوید.' : r.status === 0 ? 'اتصال به سرور برقرار نشد.' : 'نام کاربری یا رمز پذیرفته نشد (رمز حداقل ۱۲ حرف، نام کاربری ۳ تا ۳۰ حرف انگلیسی/عدد).', 'danger');
+        ['setupPass', 'setupPass2', 'setupKey'].forEach(id => { $('#' + id).value = ''; });
+        adminState.srv = true;
+        startSession(r.j.token);
+        showAdminView();
+        toast('حساب مدیر روی سرور ساخته شد. از هر دستگاه با همین نام کاربری و رمز وارد شوید.', 'success', 8000);
+        return;
+      }
       const rec = await makeRecord(user, p1);
       if (!store.set(KEYS.admin, rec)) return setMsg('adminMsg', 'ذخیره‌سازی ممکن نشد.', 'danger');
       $('#setupPass').value = ''; $('#setupPass2').value = '';
@@ -673,7 +706,14 @@
       await refreshRemoteAdmin();
       const user = str($('#adminUser').value, 30);
       const pass = $('#adminPass').value;
-      const ok = !!(user && pass) && await checkCreds(user, pass);
+      let ok, tok = '', srvMsg = '';
+      if (apiOn) {
+        const r = await api('/api/login', { method: 'POST', body: { user, pass } });
+        ok = !!(user && pass) && r.ok && !!(r.j && r.j.token);
+        if (ok) tok = r.j.token;
+        else if (r.status === 429) srvMsg = 'تلاش‌های ناموفق زیاد بود. ۱۵ دقیقه بعد دوباره امتحان کنید.';
+        else if (r.status === 0) srvMsg = 'اتصال به سرور برقرار نشد. اینترنت را بررسی کنید.';
+      } else ok = !!(user && pass) && await checkCreds(user, pass);
       // زمان پاسخ را یکنواخت می‌کنیم تا از روی سرعت، بخش نادرست قابل تشخیص نباشد
       await sleep(Math.max(0, 900 - (Date.now() - t0)) + Math.random() * 250);
       const a = audit.get();
@@ -682,7 +722,7 @@
         store.del(KEYS.lock);
         audit.set({ lastOk: Date.now(), failsBefore: a.fails || 0, fails: 0 });
         $('#adminUser').value = '';
-        startSession();
+        startSession(tok);
         showAdminView();
         if (a.fails) toast(`⚠️ ${a.fails.toLocaleString('fa-IR')} تلاش ناموفق برای ورود قبل از این ورود ثبت شده بود.`, 'danger', 9000);
       } else {
@@ -695,11 +735,12 @@
           text = `۳ بار ورود ناموفق! دسترسی به مدت ${sec.toLocaleString('fa-IR')} ثانیه مسدود شد.`;
         }
         store.set(KEYS.lock, lock);
-        setMsg('adminMsg', text, 'danger');
+        setMsg('adminMsg', srvMsg || text, 'danger');
       }
     } finally { btn.disabled = false; }
   }
   function adminLogout() {
+    if (apiOn && sessToken()) api('/api/logout', { method: 'POST', token: sessToken() });
     session.del();
     closeModal('adminModal');
     toast('با موفقیت خارج شدید.');
@@ -709,6 +750,16 @@
     if (!adminOk()) return;
     const cu = str($('#chUser').value, 30), cp = $('#chPass').value;
     const nu = str($('#chNewUser').value, 30), np = $('#chNewPass').value;
+    if (apiOn) {
+      const nu2 = str($('#chNewUser').value, 30), np2 = $('#chNewPass').value;
+      const prob2 = usernameProblem(nu2) || passwordProblem(np2, nu2);
+      if (prob2) return setMsg('pwMsg', prob2, 'danger');
+      const r = await api('/api/password', { method: 'POST', token: sessToken(), body: { user: cu, pass: cp, newUser: nu2, newPass: np2 } });
+      if (!r.ok) return setMsg('pwMsg', r.status === 401 ? 'نام کاربری یا رمز فعلی نادرست است.' : 'تغییر انجام نشد.', 'danger');
+      ['chUser', 'chPass', 'chNewUser', 'chNewPass'].forEach(id => { $('#' + id).value = ''; });
+      startSession(r.j.token);
+      return setMsg('pwMsg', 'نام کاربری و رمز جدید روی سرور ذخیره شد و همهٔ دستگاه‌های دیگر خارج شدند.', 'success');
+    }
     if (!(cu && cp && await checkCreds(cu, cp))) { await sleep(900); return setMsg('pwMsg', 'نام کاربری یا رمز فعلی نادرست است.', 'danger'); }
     const prob = usernameProblem(nu) || passwordProblem(np, nu);
     if (prob) return setMsg('pwMsg', prob, 'danger');
@@ -1087,6 +1138,40 @@
     toast('بستهٔ انتشار دانلود شد. پوشه‌های data و assets داخل آن را در گیت‌هاب آپلود کنید.', 'success', 7000);
   }
 
+  async function publishServer() {
+    if (!adminOk() || !apiOn) return;
+    const tok = sessToken(), btn = $('#btnPublishServer');
+    btn.disabled = true;
+    try {
+      const copy = JSON.parse(JSON.stringify(data));
+      const up = async url => {
+        const m = /^data:(image\/(?:png|jpe?g|webp|gif));base64,([A-Za-z0-9+/=]+)$/i.exec(url || '');
+        if (!m) return url;
+        const bin = atob(m[2]), u8 = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+        const r = await api('/api/img', { method: 'POST', token: tok, raw: u8, type: m[1].toLowerCase().replace('image/jpg', 'image/jpeg') });
+        if (r.status === 401) throw new Error('auth');
+        if (!r.ok || !r.j || !r.j.url) throw new Error('img');
+        return r.j.url;
+      };
+      for (const p of copy.products) p.img = await up(p.img);
+      for (const x of copy.slides) x.img = await up(x.img);
+      for (const x of copy.heroSlides) x.img = await up(x.img);
+      copy.settings.logo = await up(copy.settings.logo);
+      const r = await api('/api/site', { method: 'PUT', token: tok, body: { data: copy } });
+      if (r.status === 401) throw new Error('auth');
+      if (!r.ok) throw new Error('put');
+      published = sanitizeData(JSON.parse(JSON.stringify(copy)));
+      data = JSON.parse(JSON.stringify(published));
+      store.del(KEYS.data);
+      renderPublic(); renderAdmin(); fillSettingsForm();
+      toast('✅ منتشر شد. همه بازدیدکنندگان تغییرات را (حداکثر تا چند ثانیه) می‌بینند.', 'success', 7000);
+    } catch (e) {
+      if (e && e.message === 'auth') { session.del(); showAdminView(); toast('نشست پایان یافته؛ دوباره وارد شوید.', 'danger'); }
+      else toast('انتشار انجام نشد. اینترنت را بررسی کنید و دوباره بزنید.', 'danger', 7000);
+    } finally { btn.disabled = false; }
+  }
+
   function discardDraft() {
     if (!adminOk()) return;
     if (!hasDraft()) return toast('پیش‌نویس منتشرنشده‌ای وجود ندارد.');
@@ -1152,6 +1237,7 @@
         case 'logo-reset': logoPending = ''; $('#logoFile').value = ''; setPreview('logoPreview', DEFAULT_LOGO, LOGO_FALLBACK); break;
         case 'export': exportData(); break;
         case 'export-publish': exportPublish(); break;
+        case 'publish-server': publishServer(); break;
         case 'discard-draft': discardDraft(); break;
         case 'reset-site': resetSite(); break;
         default: break;
@@ -1256,6 +1342,8 @@
   /* ---------------------------------------------------------
      شروع
      --------------------------------------------------------- */
+  $('#btnPublishServer').hidden = !apiOn;
+  $('#setupKeyWrap').hidden = !apiOn;
   withFallback($('#siteLogo'), LOGO_FALLBACK);
   withFallback($('#logoPreview'), LOGO_FALLBACK);
   setPreview('prodPreview', '', placeholder('🍼', 'بدون عکس'));
@@ -1264,7 +1352,7 @@
   // پاک‌سازی دادهٔ نسخه‌های قبلی (ورود مشتری و حساب مدیر قدیمی با کد دومرحله‌ای)
   ['ninimah:users:v2', 'ninimah:user:v2', 'ninimah:admin:v2', 'ninimah:admin:v3'].forEach(k => store.del(k));
   (async () => {
-    const [pub, rem] = await Promise.all([loadPublished(), loadRemoteAdmin()]);
+    const [pub, rem] = await Promise.all([loadPublished(), apiOn ? Promise.resolve(undefined) : loadRemoteAdmin()]);
     published = pub;
     if (rem !== undefined) adminState.remote = rem;
     const draft = store.get(KEYS.data, null);
