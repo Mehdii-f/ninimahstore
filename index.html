@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <!-- سیاست امنیت محتوا: جلوگیری از اجرای اسکریپت‌های تزریقی (XSS) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.workers.dev; object-src 'none'; base-uri 'none'; form-action 'none'" />
   <meta name="referrer" content="no-referrer" />
   <meta name="theme-color" content="#1a8cff" />
   <meta name="description" content="سیسمونی نی‌نی ماه؛ فروشگاه تخصصی پوشاک نوزاد، تخت و کمد، لوازم بهداشتی، اسباب‌بازی و اکسسوری کودک" />
   <title>سیسمونی نی‌نی ماه | فروشگاه تخصصی نوزاد و کودک</title>
+  <meta name="platform-verification" content="tuwipitnwq" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
   <meta name="keywords" content="سیسمونی, سیسمونی نوزاد, پوشاک نوزاد, تخت نوزاد, کمد نوزاد, لوازم بهداشتی نوزاد, اسباب بازی کودک, فروشگاه نی نی, نی نی ماه" />
   <link rel="canonical" href="https://ninimahstore.ir/" />
@@ -152,6 +153,7 @@
       <div data-view="setup" hidden>
         <p class="hint">راه‌اندازی اولیه: یک نام کاربری یکتا و رمز قوی بسازید. بعد از آپلود «بستهٔ انتشار» در گیت‌هاب، از هر دستگاه و مرورگری (از جمله ویندوز) با همین نام کاربری و رمز وارد می‌شوید. نام کاربری و رمز هرگز به صورت متن ساده ذخیره نمی‌شوند.</p>
         <form id="adminSetupForm" novalidate autocomplete="off">
+          <div class="field" id="setupKeyWrap" hidden><label for="setupKey">کد راه‌اندازی (همان SETUP_KEY که در Cloudflare گذاشتید)</label><input id="setupKey" type="password" maxlength="128" dir="ltr" autocomplete="off" /></div>
           <div class="field"><label for="setupUser">نام کاربری (یکتا؛ نه «admin»)</label><input id="setupUser" type="text" maxlength="30" dir="ltr" autocomplete="username" autocapitalize="none" spellcheck="false" /></div>
           <div class="field"><label for="setupPass">رمز عبور (حداقل ۱۴ کاراکتر؛ حرف بزرگ و کوچک، عدد و نماد)</label><input id="setupPass" type="password" maxlength="128" dir="ltr" autocomplete="new-password" /></div>
           <div class="field"><label for="setupPass2">تکرار رمز عبور</label><input id="setupPass2" type="password" maxlength="128" dir="ltr" autocomplete="new-password" /></div>
@@ -353,7 +355,8 @@
               <li>پس از انتشار، «حذف پیش‌نویس» را بزنید تا این مرورگر هم نسخهٔ منتشرشده را نشان دهد.</li>
             </ol>
             <div class="btn-row">
-              <button class="btn btn-primary" type="button" data-action="export-publish">دانلود بستهٔ انتشار (ZIP)</button>
+              <button class="btn btn-primary" type="button" id="btnPublishServer" data-action="publish-server" hidden>انتشار روی سرور (فوری)</button>
+              <button class="btn btn-primary" type="button" id="btnExportZip" data-action="export-publish">دانلود بستهٔ انتشار (ZIP)</button>
               <button class="btn btn-soft" type="button" data-action="discard-draft">حذف پیش‌نویس</button>
             </div>
           </div>
